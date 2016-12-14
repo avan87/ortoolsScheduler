@@ -9,32 +9,32 @@
 
      Assignment Assignments:: Null = Assignment("name");
 
-    void Assignments::addConstraints(std::vector<std::pair<Worker, Job>> includeConstraints,
-                                     std::vector<std::pair<Worker, Job>> excludeConstraints,
-                                     std::vector<std::pair<Worker, Job>> priorityConstraints) {
+    void Assignments::addConstraints(const std::vector<std::pair<Worker, Job>> &includeConstraints,
+                                     const std::vector<std::pair<Worker, Job>> &excludeConstraints,
+                                     const std::vector<std::pair<Worker, Job>> &priorityConstraints) {
 
         for (auto assignment : all){
 
             if(!includeConstraints.empty()
                     && (std::any_of(includeConstraints.begin(), includeConstraints.end(),
-                                    [&](std::pair<Worker,Job> pair) { return pair.first.getId() == assignment.getWorker().getId()
-                                                                             && pair.second.getId() == assignment.getJob().getId();}
+                                    [&](std::pair<Worker,Job> pair) { return pair.first.id() == assignment.getWorker().id()
+                                                                             && pair.second.id() == assignment.getJob().id();}
             ))){
                 assignment.getInterval()->SetPerformed(true);
             }
 
             if(!excludeConstraints.empty()
                     && (std::any_of(excludeConstraints.begin(), excludeConstraints.end(),
-                                    [&](std::pair<Worker,Job> pair) { return pair.first.getId() == assignment.getWorker().getId()
-                                                                             && pair.second.getId() == assignment.getJob().getId();}
+                                    [&](std::pair<Worker,Job> pair) { return pair.first.id() == assignment.getWorker().id()
+                                                                             && pair.second.id() == assignment.getJob().id();}
             ))){
                 assignment.getInterval()->SetPerformed(false);
             }
 
             if(!priorityConstraints.empty()
                     && (std::any_of(priorityConstraints.begin(), priorityConstraints.end(),
-                                    [&](std::pair<Worker,Job> pair) { return pair.first.getId() == assignment.getWorker().getId()
-                                                                             && pair.second.getId() == assignment.getJob().getId();}
+                                    [&](std::pair<Worker,Job> pair) { return pair.first.id() == assignment.getWorker().id()
+                                                                             && pair.second.id() == assignment.getJob().id();}
             ))){
 
                 assignment.setPriority(1);
@@ -46,20 +46,28 @@
 
             for(auto wc1 : workerConstraints){
 
+                std::vector<Assignment> ws(workerConstraints);
+                auto j = ws.begin();
 
-                int counter = 0;
-                while(workerConstraints[counter].getName() != wc1.getName()){ ++counter;}
+                while (j != ws.end()) {
+                    if(wc1.getName() != j->getName()){
+                        ws.erase(j);
+                    }
 
-                std::vector<Assignment> vec(workerConstraints.begin() + (counter + 1), workerConstraints.end());
+                    else ++j;
+                }
+
+                ws.erase(j);
+
 
 
 
                 //std::cout << vec.size() << std::endl;
 
-                for(auto wc2 : vec){
+                for(auto wc2 : ws){
                     if(wc1.getName() == wc2.getName()) continue;
 
-                    if(&wc1 == &Assignments::Null && &wc2 == &Assignments::Null){
+                    if(wc1.getName() != Assignments::Null.getName() && wc2.getName() != Assignments::Null.getName()){
 
                         if(!wc1.getInterval()->MustBePerformed() || !wc2.getInterval()->MustBePerformed()){
                             solver->AddConstraint(solver->MakeTemporalDisjunction(wc1.getInterval(), wc2.getInterval()));
@@ -77,4 +85,8 @@
 
 
 
+}
+
+const std::unique_ptr<operations_research::Solver> &Assignments::getSolver() const {
+    return solver;
 }

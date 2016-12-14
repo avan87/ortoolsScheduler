@@ -2,29 +2,28 @@
 // Created by metis on 11/30/16.
 //
 #include "constraint_solver/constraint_solver.h"
-#include "Job.h"
-#include "worker.h"
-
+#include "proto/scheduler.pb.h"
 #ifndef SCHEDULER_ASSIGNMENT_H
 #define SCHEDULER_ASSIGNMENT_H
 
 
+
     class Assignment {
-        public:
+    public:
 
         Assignment(operations_research::IntervalVar *interval,
                    const std::vector<operations_research::IntVar *> &maximizeVars, const Worker &worker, const Job &job)
                 : interval(interval), maximizeVars(maximizeVars), worker(worker), job(job) {
 
-            this->cost = worker.getCost() -  job.getCost();
-            this->name = "{" + worker.getName() + " :" + job.getName() + "}";
+            this->cost = worker.cost() - job.cost();
+            this->name = "{" + worker.name() + " :" + job.name() + "}";
         }
 
-        Assignment(std::string n):name("Empty"){
+        Assignment(std::string n) : name("Empty") {
 
         }
 
-        Assignment(){}
+        Assignment() {}
 
         operations_research::IntervalVar *getInterval() const {
             return interval;
@@ -58,15 +57,15 @@
             return name;
         }
 
-        private:
+    private:
 
-            operations_research::IntervalVar* interval ;
-            std::vector<operations_research:: IntVar*>  maximizeVars ;
-            Worker worker;
-            Job job;
-            int cost = 0;
-            int priority = 0;
-            std::string name = "";
+        operations_research::IntervalVar *interval;
+        std::vector<operations_research::IntVar *> maximizeVars;
+        Worker worker;
+        Job job;
+        int cost = 0;
+        int priority = 0;
+        std::string name = "";
 
 
     };

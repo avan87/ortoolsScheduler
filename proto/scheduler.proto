@@ -1,0 +1,107 @@
+syntax = "proto3";
+
+
+option java_multiple_files = true;
+option java_package = "io.grpc.examples.scheduler";
+option java_outer_classname = "SchedulerProto";
+option objc_class_prefix = "SCHD";
+
+
+service Schedule{
+
+    rpc GetSchedule(Data) returns (stream Pair){}
+}
+
+
+
+message Data{
+
+    repeated Worker workers = 1;
+    repeated Job jobs = 2;
+    IncludeConstraints includeConstraints = 3;
+    ExcludeConstraints excludeConstraints = 4;
+    PriorityConstraints priorityConstraints = 5;
+    SchedulingSettingsProvider schedulingSettingsProvider = 6;
+
+}
+
+
+
+
+message Pair {
+    Worker worker = 1;
+    Job job = 2;
+}
+
+
+message IncludeConstraints{
+    repeated Pair pair = 1;
+}
+
+
+message ExcludeConstraints{
+    repeated Pair pair = 1;
+}
+
+
+message PriorityConstraints{
+    repeated Pair pair = 1;
+}
+
+message SchedulingSettingsProvider{
+
+    bool MaximizeFleetLoad = 1;
+    int32 WeightFactor = 2;
+    int32 IsoRefFactor = 3;
+    int32 RatingFactor = 4;
+    int32 TimeFactor = 5;
+    int32 TransitionFactor = 6;
+    int32 PayFactor = 7;
+    int32 LegFactor = 8;
+
+
+}
+
+
+message SchedulingParameters{
+
+    bool Ref= 1;
+    bool Iso = 2;
+    int32 Rating = 3;
+    string GroupId = 4;
+
+}
+
+
+message Worker{
+
+    string Id = 1;
+    int32 Cost = 2;
+    string Name = 3;
+    double X = 4;
+    double Y = 5;
+    SchedulingParameters Parameters = 6;
+}
+
+
+message Job{
+
+    string  Id = 1;
+    string Start = 2;
+    string End = 3;
+    int32 Cost = 4;
+    string Name = 5;
+    double X = 6;
+    double Y = 7;
+    SchedulingParameters Parameters = 8;
+
+}
+
+message Workers{
+    repeated Worker workers = 1;
+}
+
+message Jobs{
+    repeated Job jobs = 1;
+}
+
